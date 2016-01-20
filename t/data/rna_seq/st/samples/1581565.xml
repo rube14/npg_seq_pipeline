@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sample api_version="0.6">
-  <id>1882516</id>
-  <name>DNMT3A_Promega_gF_Trans1</name>
-  <study_id>1980</study_id>
+  <id>1317439</id>
+  <name>A_JM8_RNA</name>
+  <study_id>1708</study_id>
   <consent_withdrawn>false</consent_withdrawn>
   <properties>
     <property>
       <name>Organism</name>
-      <value></value>
+      <value>mouse</value>
     </property>
     <property>
       <name>Cohort</name>
@@ -51,11 +51,7 @@
     </property>
     <property>
       <name>Gender</name>
-      <value></value>
-    </property>
-    <property>
-      <name>Donor Id</name>
-      <value></value>
+      <value>Male</value>
     </property>
     <property>
       <name>DNA source</name>
@@ -63,27 +59,27 @@
     </property>
     <property>
       <name>Public Name</name>
-      <value></value>
+      <value>A_JM8_RNA</value>
     </property>
     <property>
       <name>Common Name</name>
-      <value></value>
+      <value>mus musculus</value>
     </property>
     <property>
       <name>Strain</name>
-      <value></value>
+      <value>C57Bl/6N</value>
     </property>
     <property>
       <name>TAXON ID</name>
-      <value></value>
+      <value>10090</value>
     </property>
     <property>
       <name>ENA Sample Accession Number</name>
-      <value></value>
+      <value>ERS208948</value>
     </property>
     <property>
       <name>Sample Description</name>
-      <value></value>
+      <value>Micro RNA</value>
     </property>
     <property>
       <name>Sample Visibility</name>
@@ -135,79 +131,80 @@
     </property>
     <property>
       <name>Genotype</name>
-      <value></value>
+      <value>WT</value>
     </property>
     <property>
       <name>Phenotype</name>
-      <value></value>
+      <value>N/A</value>
     </property>
     <property>
       <name>Age</name>
-      <value></value>
+      <value>N/A</value>
     </property>
     <property>
       <name>Developmental Stage</name>
-      <value></value>
+      <value>N/A</value>
     </property>
     <property>
       <name>Cell Type</name>
-      <value></value>
+      <value>ES cell</value>
     </property>
     <property>
       <name>Disease State</name>
-      <value></value>
+      <value>N/A</value>
     </property>
     <property>
       <name>Compound</name>
-      <value></value>
+      <value>N/A</value>
     </property>
     <property>
       <name>Dose</name>
-      <value></value>
+      <value>N/A</value>
     </property>
     <property>
       <name>Immunoprecipitate</name>
-      <value></value>
+      <value>N/A</value>
     </property>
     <property>
       <name>Growth Condition</name>
-      <value></value>
+      <value>N/A</value>
     </property>
     <property>
       <name>RNAi</name>
-      <value></value>
+      <value>N/A</value>
     </property>
     <property>
       <name>Organism Part</name>
-      <value></value>
+      <value>N/A</value>
     </property>
     <property>
       <name>Time Point</name>
-      <value></value>
+      <value>N/A</value>
     </property>
     <property>
       <name>Treatment</name>
-      <value></value>
+      <value>N/A</value>
     </property>
     <property>
       <name>Subject</name>
-      <value></value>
+      <value>N/A</value>
     </property>
     <property>
       <name>Disease</name>
-      <value></value>
+      <value>N/A</value>
     </property>
     <property>
       <name>Reference Genome</name>
-      <value>Homo_sapiens (GRCh37_53)</value>
+      <value>Homo_sapiens (1000Genomes_hs37d5)</value>
     </property>
   </properties>
   <assets>
-    <asset id="9658093" href="/assets/9658093"/>
-    <asset id="9658375" href="/assets/9658375"/>
-    <asset id="9658377" href="/assets/9658377"/>
-    <asset id="9658378" href="/assets/9658378"/>
+    <asset id="4069503" href="/assets/4069503"/>
+    <asset id="4106319" href="/assets/4106319"/>
+    <asset id="4106331" href="/assets/4106331"/>
+    <asset id="4221840" href="/assets/4221840"/>
+    <asset id="4643899" href="/assets/4643899"/>
+    <asset id="5145308" href="/assets/5145308"/>
   </assets>
-  <study_id>1980</study_id>
+  <study_id>1708</study_id>
 </sample>
-

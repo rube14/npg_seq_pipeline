@@ -12,6 +12,8 @@ use Cwd qw(abs_path);
 use File::Slurp;
 use FindBin qw($Bin);
 use Readonly;
+use Try::Tiny;
+
 use npg_tracking::util::abs_path qw(network_abs_path);
 
 our $VERSION = '0';
@@ -29,7 +31,7 @@ with q{npg_pipeline::roles::business::flag_options};
 
 Readonly::Scalar my $DEFAULT_JOB_ID_FOR_NO_BSUB => 50;
 Readonly::Scalar my $CONF_DIR                   => q{data/config_files};
-Readonly::Array  my @FLAG2FUNCTION_LIST         => qw/ olb qc_run /;
+Readonly::Array  my @FLAG2FUNCTION_LIST         => qw/ olb qc_run gclp /;
 
 $ENV{LSB_DEFAULTPROJECT} ||= q{pipeline};
 
@@ -240,8 +242,13 @@ Boolean decision to force on P4 pipeline usage
 has q{force_p4}  => (
   isa           => q{Bool},
   is            => q{ro},
-  documentation => q{Boolean decision to force on P4 pipeline usage},
+  lazy_build    => 1,
+  documentation => q{Boolean decision to force on P4 pipeline usage, default true iff GCLP},
 );
+sub _build_force_p4 {
+  my ($self) = @_;
+  return $self->gclp;
+}
 
 =head2 verbose
 
@@ -367,12 +374,13 @@ has 'function_list' => (
 );
 sub _build_function_list {
   my $self = shift;
+  my $suffix = q();
   foreach my $flag (@FLAG2FUNCTION_LIST) {
     if ($self->can($flag) && $self->$flag) {
-      return $flag;
+      $suffix .= "_$flag";
     }
   }
-  return $self->pipeline_name;
+  return $self->pipeline_name . $suffix;
 }
 around 'function_list' => sub {
   my $orig = shift;
@@ -385,18 +393,40 @@ around 'function_list' => sub {
     if ($v !~ /\A\w+\Z/smx) {
       croak "Bad function list name: $v";
     }
-    $file = $self->_conf_file_path( 'function_list_' . $v . '.yml');
+    try {
+      $file = $self->_conf_file_path((join q[_],'function_list',$v) . '.yml');
+    } catch {
+      my $pipeline_name = $self->pipeline_name;
+      if ($v !~ /^$pipeline_name/smx) {
+        $file = $self->_conf_file_path((join q[_],'function_list',$self->pipeline_name,$v) . '.yml');
+      } else {
+        croak $_;
+      }
+    };
   }
   if ($self->verbose) {
     $self->log("Will use function list $file");
   }
   return $file;
 };
+sub _build_gclp {
+  my ($self) = @_;
+  return $self->has_function_list && $self->function_list =~ /gclp/ismx;
+}
 
 =head2 function_list_conf
 
 =cut
-has 'function_list_conf' => (
+
+=head2 study_analysis_conf
+
+Returns an array ref of study analysis configuration details. If the configuration file is not
+found or is not readable, an empty array is returned.
+
+=cut 
+
+has [qw { function_list_conf
+          study_analysis_conf } ] => (
   isa        => q{ArrayRef},
   is         => q{ro},
   lazy_build => 1,
@@ -406,6 +436,25 @@ has 'function_list_conf' => (
 sub _build_function_list_conf {
   my ( $self ) = @_;
   return $self->_read_config( $self->function_list );
+}
+sub _build_study_analysis_conf {
+  my ( $self ) = @_;
+
+  my $config = [];
+  my $path;
+  try {
+    $path = $self->_conf_file_path( $self->_conf_file_path(q{study_analysis.yml}) );
+  } catch {
+    if ($self->verbose) {
+      $self->log(qq[Failed to retrieve study analysis configuration: $_]);
+    }
+  };
+
+  if ($path) {
+    $config = $self->_read_config($path);
+  }
+
+  return $config;
 }
 
 =head2 general_values_conf
@@ -445,7 +494,6 @@ sub _build_parallelisation_conf {
   my ( $self ) = @_;
   return $self->_read_config( $self->_conf_file_path(q{parallelisation.yml}) );
 }
-
 sub _build_daemon_conf { # this file is optional
   my ( $self ) = @_;
   my $path = abs_path( catfile($self->conf_path(), 'daemon.ini') );

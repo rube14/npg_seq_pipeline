@@ -13,7 +13,7 @@ has 'irods_root' => ( isa => 'Str',
 
 sub _build_irods_root {
   my $self = shift;
-  return $self->function_list() =~ /gclp/ismx ? q(/gseq/) : q(/seq/);
+  return $self->gclp ? q(/gseq/) : q(/seq/);
 }
 
 sub submit_to_lsf {
@@ -23,10 +23,18 @@ sub submit_to_lsf {
   return ($job_id);
 }
 
+sub _outgoing_path {
+  my $path = shift;
+  if ($path) {
+    $path =~ s/\/analysis\//\/outgoing\//xms;
+  }
+  return $path;
+}
+
 sub _generate_bsub_command {
   my ($self, $arg_refs) = @_;
 
-  my $irodsinstance = $self->function_list() =~ /gclp/ismx ? q(gclp) : q();
+  my $irodsinstance = $self->gclp ? q(gclp) : q();
   my $id_run = $self->id_run();
 
   my $required_job_completion = $arg_refs->{'required_job_completion'};
@@ -36,6 +44,7 @@ sub _generate_bsub_command {
   my $job_name = $job_name_prefix . q{_} . $timestamp;
 
   my $location_of_logs = $self->make_log_dir( $self->recalibrated_path() );
+  $location_of_logs = _outgoing_path($location_of_logs);
   my $bsub_command = q{bsub -q } . $self->lowload_lsf_queue() . qq{ $required_job_completion -J $job_name };
 
   $bsub_command .=  ( $self->fs_resource_string( {
@@ -44,13 +53,17 @@ sub _generate_bsub_command {
   } ) ) . q{ };
 
   $bsub_command .=  q{-o } . $location_of_logs . qq{/$job_name.out };
+
+  my $future_path = _outgoing_path($self->runfolder_path());
+  $bsub_command .= qq{-E "[ -d '$future_path' ]" };
+
   $bsub_command .=  q{'};
 
   if ($irodsinstance) {
     $bsub_command .= q{irodsEnvFile=$}.q{HOME/.irods/.irodsEnv-} . $irodsinstance . q{-iseq-logs };
   }
 
-  $bsub_command .=  $archive_script . q{ --runfolder_path } . $self->runfolder_path() . q{ --id_run } . $self->id_run();
+  $bsub_command .=  $archive_script . q{ --runfolder_path } . $future_path . q{ --id_run } . $self->id_run();
 
   $bsub_command .= q{ --irods_root } . $self->irods_root();
 
