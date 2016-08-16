@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 93;
+use Test::More tests => 91;
 use Test::Exception;
 use File::Temp qw(tempdir tempfile);
 use File::Copy qw(cp);
@@ -47,17 +47,9 @@ use_ok(q{npg_pipeline::base});
     general_values_conf
     illumina_pipeline_conf
     pb_cal_pipeline_conf
-    daemon_conf
   } ) {
     isa_ok( $base->$config_group(), q{HASH}, q{$} . qq{base->$config_group} );
   }
-
-  my $tempdir = tempdir( CLEANUP => 1 );
-  $base = npg_pipeline::base->new(conf_path => $tempdir, verbose => 0);
-  is_deeply($base->study_analysis_conf(), [],
-    'no study analysis config file - empty array returned');
-  $base = npg_pipeline::base->new(conf_path => 't/data/study_analysis_conf');
-  isa_ok($base->study_analysis_conf(), 'ARRAY', 'array of study configurations');
 }
 
 {
@@ -282,5 +274,32 @@ package main;
   is ($base->fq_filename(3, 0, 1), '4_3_1#0.fastq');
   is ($base->fq_filename(3, 0, 2), '4_3_2#0.fastq');
 }
+
+subtest 'lims driver type' => sub {
+  plan tests => 7;
+
+  my $base = npg_pipeline::base->new(id_run => 4);
+  is($base->lims_driver_type, 'ml_warehouse');
+  $base = npg_pipeline::base->new(id_run => 4,
+                                  id_flowcell_lims => 1234567890123);
+  is($base->lims_driver_type, 'warehouse');
+  $base = npg_pipeline::base->new(id_run => 4,
+                                  id_flowcell_lims => 12345678);
+  is($base->lims_driver_type, 'ml_warehouse');
+  $base = npg_pipeline::base->new(id_run => 4, qc_run=>0);
+  is($base->lims_driver_type, 'ml_warehouse');
+  $base = npg_pipeline::base->new(id_run => 4,
+                                  qc_run => 0,
+                                  id_flowcell_lims => 1234567890123);
+  is($base->lims_driver_type, 'ml_warehouse');
+  $base = npg_pipeline::base->new(id_run => 4,
+                                  qc_run=>1,
+                                  id_flowcell_lims => 1234567890123);
+  is($base->lims_driver_type, 'warehouse');
+  $base = npg_pipeline::base->new(id_run => 4,
+                                  qc_run=>1,
+                                  id_flowcell_lims => 12345678);
+  is($base->lims_driver_type, 'ml_warehouse');
+};
 
 1;
