@@ -23,7 +23,7 @@ foreach my $tool (($sp, $java)) {
   `touch $tool`;
   `chmod +x $tool`;
 }
-local $ENV{PATH} = join q[:], $tdir, qq[$cwd/t/bin], $ENV{PATH};
+local $ENV{PATH} = join q[:], $tdir, qq[$cwd/t/bin],  qq[$cwd/t/bin/software/solexa/bin], $ENV{PATH};
 
 my $central = q{npg_pipeline::pluggable::harold::central};
 use_ok($central);
@@ -68,11 +68,12 @@ my $runfolder_path = $util->analysis_runfolder_path();
     qc_genotype
     qc_verify_bam_id
     qc_upstream_tags
+    qc_rna_seqc
     run_analysis_complete
     update_ml_warehouse
-    archive_to_irods
-    run_qc_review_pending          
-    lsf_end     
+    archive_to_irods_samplesheet
+    run_qc_review_pending
+    lsf_end
   }];
   is_deeply( $pipeline->function_order() , $expected_function_order, q{Function order correct} );
 }
