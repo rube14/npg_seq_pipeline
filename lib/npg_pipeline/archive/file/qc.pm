@@ -67,7 +67,7 @@ sub run_qc {
 
   my $qc_to_run = $self->qc_to_run();
   my $id_run = $self->id_run();
-  $self->log(qq{Running qc test $qc_to_run on Run $id_run});
+  $self->info(qq{Running qc test $qc_to_run on Run $id_run});
 
   foreach my $position ($self->positions()) {
     if ( $self->is_multiplexed_lane($position) && (-e $self->lane_archive_path( $position ) ) ) {
@@ -160,7 +160,8 @@ sub _generate_bsub_command {
 
   $job_sub .= qq{ '$command'};
 
-  if ($self->verbose()) { $self->log($job_sub); }
+  $self->debug($job_sub);
+
   return $job_sub;
 }
 
@@ -199,8 +200,8 @@ sub _qc_command {
 
   if ($REQUIRES_QC_REPORT_DIR->{$self->qc_to_run()}) {
     my @archive_qc_path = ($archive_path, q[qc], $REQUIRES_QC_REPORT_DIR->{$self->qc_to_run()});
-    my $rptstr          = join q[_], $self->id_run(), $lanestr;
-    my $qc_report_dir   = File::Spec->catdir(@archive_qc_path, $rptstr);
+    my $rptstr = join q[_], $self->id_run(), (defined $indexed ? $lanestr : $self->lsb_jobindex());
+    my $qc_report_dir = File::Spec->catdir(@archive_qc_path, $rptstr);
     if (defined $indexed) {
       $rptstr        = join q[#], $rptstr, $tagstr;
       $qc_report_dir = File::Spec->catdir($qc_report_dir, $rptstr);
