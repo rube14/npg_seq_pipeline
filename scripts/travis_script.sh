@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e -x
+set -x
 
 perl Build.PL
 ./Build clean

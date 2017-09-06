@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e -x
+set -x
 
 sudo apt-get update -qq
 sudo addgroup solexa
