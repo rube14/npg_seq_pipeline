@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e -x
+set -x
 
 # The default build branch for all repositories. This defaults to
 # TRAVIS_BRANCH unless set in the Travis build environment.
